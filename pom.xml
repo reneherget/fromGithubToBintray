@@ -1,0 +1,87 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>myproject</groupId>
+	<artifactId>myproject</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<scm>
+		<url>https://github.com/d0x/fromGithubToBintray</url>
+		<connection>scm:git:git://github.com/d0x/fromGithubToBintray.git</connection>
+		<developerConnection>scm:git:git@github.com:d0x/fromGithubToBintray.git</developerConnection>
+	</scm>
+
+	<developers>
+		<developer>
+			<email>cschneiderpublic@gmail.com</email>
+			<name>Christian Schneider</name>
+			<url>https://github.com/d0x</url>
+			<id>d0x</id>
+		</developer>
+	</developers>
+
+<!-- 	<distributionManagement> -->
+<!-- 		<repository> -->
+<!-- 			<id>bintray</id> -->
+<!-- 			<url>https://api.bintray.com/maven/d0x/fromGithubToBintray/downloads</url> -->
+<!-- 		</repository> -->
+<!-- 	</distributionManagement> -->
+
+
+	<properties>
+		<mainClass>fromGithubToBintray.Main</mainClass>
+
+		<java-version>1.7</java-version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<dependencies>
+		<!-- ... -->		
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<!-- To build a clean binary pacakge to distribute -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.4</version>
+				<configuration>
+					<programs>
+						<program>
+							<mainClass>${mainClass}</mainClass>
+							<name>fromGithubToBintray</name>
+						</program>
+					</programs>
+
+					<extraJvmArguments>-Djava.awt.headless=true</extraJvmArguments>
+				</configuration>
+			</plugin>
+
+			<!-- To specify the Java Version -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.0</version>
+				<configuration>
+					<source>${java-version}</source>
+					<target>${java-version}</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
