@@ -72,55 +72,6 @@
 				</executions>
 			</plugin>
 
-			<!-- To create the zip file -->
-			<plugin>
-				<artifactId>maven-assembly-plugin</artifactId>
-				<version>2.2-beta-5</version>
-				<configuration>
-					<descriptors>
-						<descriptor>src/main/assembly/zip.xml</descriptor>
-						<descriptor>src/main/assembly/tar.gz.xml</descriptor>
-					</descriptors>
-				</configuration>
-				<executions>
-					<execution>
-						<!-- <id>make-assembly</id> -->
-						<phase>package</phase>
-						<goals>
-							<goal>single</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.6</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<target>
-							
-<!-- curl -T <FILE.EXT> -u$USER:<API_KEY> https://api.bintray.com/content/$USER/generic/<UR_COOL_PACKAGE_NAME>/<VERSION_NAME>/<FILE_TARGET_PATH> -->
-							
-							
-								<exec executable="curl">
-									<arg value="-T" />
-									<arg value="target/${project.groupId}-${project.version}-bin.zip" />
-									<arg value="-ud0x:${API_KEY}" />
-									<arg value="https://api.bintray.com/content/d0x/fromGithubToBintray/downloads/1.0.0-test1/${project.groupId}-bin-${project.version}-bin.zip" />
-								</exec>
-							</target>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-
 			<!-- To specify the Java Version -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -141,6 +92,68 @@
 				</configuration>
 			</plugin>
 		</plugins>
+
+		<extensions>
+		
+			<!-- To read the <servers /> tag from the .settings.xml -->
+			<extension>
+				<groupId>com.github.shyiko.servers-maven-extension</groupId>
+				<artifactId>servers-maven-extension</artifactId>
+				<version>1.1.0</version>
+			</extension>
+		</extensions>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<!-- To create the zip file -->
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<version>2.2-beta-5</version>
+						<configuration>
+							<descriptors>
+								<descriptor>src/main/assembly/zip.xml</descriptor>
+								<descriptor>src/main/assembly/tar.gz.xml</descriptor>
+							</descriptors>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>install</phase>
+								<goals>
+									<goal>single</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<phase>package</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<target>
+										<exec executable="curl">
+											<arg value="-T" />
+											<arg value="target/${project.groupId}-${project.version}-bin.zip" />
+											<arg value="-u${settings.servers.bintray.username}:${settings.servers.bintray.password}" />
+											<arg value="https://api.bintray.com/content/${settings.servers.bintray.username}/fromGithubToBintray/downloads/${project.version}/${project.groupId}-bin-${project.version}-bin.zip" />
+										</exec>
+									</target>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
