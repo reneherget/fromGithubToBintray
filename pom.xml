@@ -22,12 +22,12 @@
 		</developer>
 	</developers>
 
-<!-- 	<distributionManagement> -->
-<!-- 		<repository> -->
-<!-- 			<id>bintray</id> -->
-<!-- 			<url>https://api.bintray.com/maven/d0x/fromGithubToBintray/downloads</url> -->
-<!-- 		</repository> -->
-<!-- 	</distributionManagement> -->
+	<!-- <distributionManagement> -->
+	<!-- <repository> -->
+	<!-- <id>bintray</id> -->
+	<!-- <url>https://api.bintray.com/maven/d0x/fromGithubToBintray/downloads</url> -->
+	<!-- </repository> -->
+	<!-- </distributionManagement> -->
 
 
 	<properties>
@@ -39,13 +39,14 @@
 	</properties>
 
 	<dependencies>
-		<!-- ... -->		
+		<!-- ... -->
 	</dependencies>
 
 	<build>
 		<plugins>
 
-			<!-- To build a clean binary pacakge to distribute -->
+			<!-- To build a clean binary package to distribute -->
+			<!-- Note: This has to be placed before the assembly plugin! -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>appassembler-maven-plugin</artifactId>
@@ -60,7 +61,65 @@
 
 					<extraJvmArguments>-Djava.awt.headless=true</extraJvmArguments>
 				</configuration>
+				<executions>
+					<execution>
+						<!-- <id>make-assembly</id> -->
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
+
+			<!-- To create the zip file -->
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-5</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/zip.xml</descriptor>
+						<descriptor>src/main/assembly/tar.gz.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<!-- <id>make-assembly</id> -->
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+							
+<!-- curl -T <FILE.EXT> -u$USER:<API_KEY> https://api.bintray.com/content/$USER/generic/<UR_COOL_PACKAGE_NAME>/<VERSION_NAME>/<FILE_TARGET_PATH> -->
+							
+							
+								<exec executable="curl">
+									<arg value="-T" />
+									<arg value="target/${project.groupId}-${project.version}-bin.zip" />
+									<arg value="-ud0x:${API_KEY}" />
+									<arg value="https://api.bintray.com/content/d0x/fromGithubToBintray/downloads/1.0.0-test1/${project.groupId}-bin-${project.version}-bin.zip" />
+								</exec>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 
 			<!-- To specify the Java Version -->
 			<plugin>
